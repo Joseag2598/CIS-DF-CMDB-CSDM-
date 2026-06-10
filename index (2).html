@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceNow CIS — Data Foundations: CMDB &amp; CSDM | Practice Exam</title>
+<style>
+:root{
+  --infinite-blue:#032D42; --wasabi-green:#63DF4E; --white:#FFFFFF; --black:#000;
+  --icon-bg:#2A4F62; --teal:#044355;
+  --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB; --gray-300:#D1D5DB;
+  --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-700:#374151; --gray-900:#111827;
+  --err:#F87171; --warn:#FBBF24;
+  --font-sans:'ServiceNow Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  --font-mono:'ServiceNow Sans Mono','Consolas','Monaco','Courier New',monospace;
+  --radius-sm:.5rem; --radius-md:1rem;
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);font-weight:300;color:var(--gray-900);background:var(--gray-100);line-height:1.4;display:flex;flex-direction:column;min-height:100vh}
+.hidden{display:none!important}
+
+/* ---------- Top exam bar (Pearson VUE style) ---------- */
+.exam-bar{background:var(--infinite-blue);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.25rem;flex-wrap:wrap;gap:.5rem}
+.exam-bar .brand{display:flex;align-items:center;gap:.6rem;font-weight:700;letter-spacing:-.01em;font-size:.95rem}
+.exam-bar .brand .mark{width:26px;height:26px;border-radius:6px;background:var(--wasabi-green);display:inline-flex;align-items:center;justify-content:center;color:var(--infinite-blue);font-weight:700;font-size:.8rem;font-family:var(--font-mono)}
+.exam-bar .meta{font-family:var(--font-mono);font-size:.72rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em}
+.timer-box{display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-weight:700;font-size:1rem;background:rgba(255,255,255,.06);padding:.4rem .8rem;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.12)}
+.timer-box .lbl{font-size:.6rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;font-weight:400}
+.timer-box.warn-time{color:var(--warn);border-color:var(--warn)}
+.timer-box.crit-time{color:var(--err);border-color:var(--err);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+
+/* ---------- Sub bar ---------- */
+.sub-bar{background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:.5rem 1.25rem;flex-wrap:wrap;gap:.75rem;font-size:.85rem}
+.sub-bar .qcount{font-weight:700}
+.progress-wrap{flex:1;min-width:140px;max-width:380px;height:8px;background:rgba(255,255,255,.15);border-radius:9999px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:var(--wasabi-green);transition:width .25s ease}
+.mark-toggle{display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;user-select:none;font-size:.82rem}
+.mark-toggle input{width:16px;height:16px;accent-color:var(--wasabi-green)}
+
+/* ---------- Layout ---------- */
+.stage{flex:1;width:100%;max-width:1080px;margin:0 auto;padding:1.75rem 1.25rem;width:100%}
+
+/* ---------- Cards / generic ---------- */
+.card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);box-shadow:var(--shadow-md)}
+
+/* ---------- Intro screen ---------- */
+.intro-hero{background:var(--infinite-blue);color:#fff;border-radius:var(--radius-md);padding:2.5rem 2.25rem;text-align:left}
+.eyebrow{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--wasabi-green);margin-bottom:.75rem}
+.intro-hero h1{font-weight:700;font-size:2rem;line-height:1.05;letter-spacing:-.01em}
+.intro-hero h1 span{color:var(--wasabi-green)}
+.intro-hero p.sub{color:var(--gray-400);margin-top:.85rem;font-size:1rem;max-width:640px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin:1.75rem 0}
+.fact{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:1.1rem 1.2rem}
+.fact .v{font-weight:700;font-size:1.5rem;color:var(--infinite-blue)}
+.fact .l{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-500);margin-top:.25rem}
+.agreement{padding:1.6rem 1.75rem}
+.agreement h2{font-size:1.15rem;font-weight:700;color:var(--infinite-blue);margin-bottom:.9rem;letter-spacing:-.01em}
+.agreement h3{font-size:.95rem;font-weight:700;color:var(--gray-900);margin:1.2rem 0 .4rem}
+.agreement p,.agreement li{font-size:.9rem;color:var(--gray-700);margin-bottom:.55rem}
+.agreement ul{padding-left:1.25rem}
+.agreement .nda{background:var(--gray-50);border-left:3px solid var(--infinite-blue);padding:1rem 1.2rem;border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin:.5rem 0 .25rem}
+.consent{display:flex;align-items:flex-start;gap:.6rem;margin:1.5rem 0 .25rem;font-size:.9rem;cursor:pointer}
+.consent input{width:18px;height:18px;margin-top:2px;accent-color:var(--wasabi-green);flex-shrink:0}
+
+/* ---------- Buttons ---------- */
+.btn{font-family:var(--font-sans);font-weight:700;font-size:.92rem;border:none;border-radius:9999px;padding:.7rem 1.6rem;cursor:pointer;transition:transform .08s ease,opacity .15s ease;letter-spacing:-.01em}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--wasabi-green);color:var(--infinite-blue)}
+.btn-primary:disabled{background:var(--gray-300);color:var(--gray-500);cursor:not-allowed}
+.btn-ghost{background:#fff;color:var(--infinite-blue);border:1.5px solid var(--gray-300)}
+.btn-ghost:hover{border-color:var(--infinite-blue)}
+.btn-dark{background:var(--infinite-blue);color:#fff}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+
+/* ---------- Question ---------- */
+.q-card{padding:1.75rem}
+.q-num{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-500);margin-bottom:.75rem}
+.q-stem{font-size:1.08rem;font-weight:500;color:var(--gray-900);line-height:1.5;margin-bottom:1.4rem}
+.q-hint{font-size:.78rem;color:var(--gray-500);font-style:italic;margin-bottom:1.1rem}
+.opt{display:flex;align-items:flex-start;gap:.85rem;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:.95rem 1.1rem;margin-bottom:.7rem;cursor:pointer;transition:border-color .12s ease,background .12s ease}
+.opt:hover{border-color:var(--infinite-blue);background:var(--gray-50)}
+.opt.sel{border-color:var(--infinite-blue);background:rgba(3,45,66,.04)}
+.opt input{margin-top:3px;width:18px;height:18px;accent-color:var(--infinite-blue);flex-shrink:0}
+.opt .ltr{font-weight:700;color:var(--infinite-blue);font-family:var(--font-mono);flex-shrink:0;min-width:1.1rem}
+.opt .txt{font-size:.95rem;color:var(--gray-900);font-weight:300}
+
+/* ---------- Nav footer ---------- */
+.q-nav{display:flex;justify-content:space-between;align-items:center;gap:.75rem;margin-top:1.4rem;flex-wrap:wrap}
+
+/* ---------- Review navigator grid ---------- */
+.navgrid-wrap{margin-top:1.5rem}
+.navgrid-wrap h3{font-size:.8rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--gray-500);margin-bottom:.7rem}
+.navgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:.4rem}
+.navcell{aspect-ratio:1;border:1.5px solid var(--gray-300);border-radius:6px;background:#fff;font-family:var(--font-mono);font-size:.78rem;font-weight:700;color:var(--gray-700);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
+.navcell:hover{border-color:var(--infinite-blue)}
+.navcell.answered{background:var(--infinite-blue);color:#fff;border-color:var(--infinite-blue)}
+.navcell.current{outline:3px solid var(--wasabi-green);outline-offset:1px}
+.navcell.marked::after{content:"";position:absolute;top:-4px;right:-4px;width:10px;height:10px;background:var(--warn);border-radius:50%;border:2px solid #fff}
+.legend{display:flex;gap:1.1rem;flex-wrap:wrap;margin-top:.85rem;font-size:.72rem;color:var(--gray-600)}
+.legend span{display:inline-flex;align-items:center;gap:.4rem}
+.legend .sw{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--gray-300)}
+.legend .sw.a{background:var(--infinite-blue);border-color:var(--infinite-blue)}
+.legend .sw.m{background:var(--warn);border-radius:50%}
+
+/* ---------- Results ---------- */
+.result-hero{border-radius:var(--radius-md);padding:2.25rem;color:#fff;text-align:center;margin-bottom:1.5rem}
+.result-hero.pass{background:var(--infinite-blue)}
+.result-hero.fail{background:var(--teal)}
+.result-badge{display:inline-block;font-family:var(--font-mono);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;padding:.45rem 1.2rem;border-radius:9999px;margin-bottom:1rem}
+.result-badge.pass{background:var(--wasabi-green);color:var(--infinite-blue)}
+.result-badge.fail{background:var(--err);color:#fff}
+.score-big{font-size:3.5rem;font-weight:700;line-height:1}
+.score-sub{color:var(--gray-400);margin-top:.5rem;font-size:.95rem}
+.result-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1rem;margin-bottom:1.75rem}
+.rstat{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:1.1rem;text-align:center}
+.rstat .v{font-size:1.6rem;font-weight:700}
+.rstat .v.ok{color:#15803d}.rstat .v.no{color:var(--err)}.rstat .v.sk{color:var(--gray-500)}
+.rstat .l{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-500);margin-top:.3rem}
+.review-item{background:#fff;border:1px solid var(--gray-200);border-left-width:4px;border-radius:var(--radius-sm);padding:1.25rem 1.4rem;margin-bottom:.9rem}
+.review-item.correct{border-left-color:#22c55e}
+.review-item.incorrect{border-left-color:var(--err)}
+.review-item.skipped{border-left-color:var(--gray-400)}
+.ri-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:.6rem}
+.ri-num{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-500)}
+.ri-tag{font-family:var(--font-mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.2rem .65rem;border-radius:9999px;white-space:nowrap}
+.ri-tag.correct{background:rgba(34,197,94,.12);color:#15803d}
+.ri-tag.incorrect{background:rgba(248,113,113,.14);color:#b91c1c}
+.ri-tag.skipped{background:var(--gray-100);color:var(--gray-600)}
+.ri-stem{font-size:.95rem;font-weight:500;margin-bottom:.85rem;color:var(--gray-900)}
+.ri-opt{font-size:.88rem;padding:.45rem .7rem;border-radius:6px;margin-bottom:.35rem;display:flex;gap:.6rem;color:var(--gray-700)}
+.ri-opt .ltr{font-family:var(--font-mono);font-weight:700;flex-shrink:0}
+.ri-opt.correct-opt{background:rgba(34,197,94,.1);color:#166534}
+.ri-opt.wrong-pick{background:rgba(248,113,113,.12);color:#b91c1c}
+.ri-opt .flag{margin-left:auto;font-size:.7rem;font-family:var(--font-mono);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.review-filters{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.filter-btn{font-family:var(--font-mono);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;border:1.5px solid var(--gray-300);background:#fff;color:var(--gray-700);border-radius:9999px;padding:.4rem 1rem;cursor:pointer}
+.filter-btn.active{background:var(--infinite-blue);color:#fff;border-color:var(--infinite-blue)}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(3,45,66,.55);display:flex;align-items:center;justify-content:center;padding:1.25rem;z-index:50}
+.modal{background:#fff;border-radius:var(--radius-md);max-width:460px;width:100%;padding:1.9rem;box-shadow:var(--shadow-md)}
+.modal h2{font-size:1.2rem;color:var(--infinite-blue);font-weight:700;margin-bottom:.75rem}
+.modal p{font-size:.92rem;color:var(--gray-700);margin-bottom:.6rem}
+.modal .stat-line{font-family:var(--font-mono);font-size:.82rem;color:var(--gray-600);background:var(--gray-50);border-radius:var(--radius-sm);padding:.8rem 1rem;margin:1rem 0}
+.modal .btn-row{justify-content:flex-end;margin-top:1.4rem}
+
+/* ---------- Footer ---------- */
+.site-footer{background:var(--infinite-blue);color:var(--gray-400);text-align:center;padding:1.6rem 1.25rem;font-size:.8rem;font-weight:300;margin-top:auto}
+.site-footer .contact{color:#fff;font-weight:500}
+.site-footer .contact b{color:var(--wasabi-green)}
+.site-footer .fine{font-size:.7rem;color:var(--gray-500);margin-top:.5rem}
+
+@media(max-width:640px){
+  .intro-hero h1{font-size:1.55rem}
+  .q-card{padding:1.25rem}
+  .score-big{font-size:2.6rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOP BAR (exam only) ===== -->
+<div class="exam-bar hidden" id="examBar">
+  <div class="brand"><span class="mark">SN</span> CIS — Data Foundations: CMDB &amp; CSDM</div>
+  <div class="timer-box" id="timerBox"><span class="lbl">Time Remaining</span><span id="timer">90:00</span></div>
+</div>
+<div class="sub-bar hidden" id="subBar">
+  <span class="qcount" id="qcount">Question 1 of 75</span>
+  <div class="progress-wrap"><div class="progress-bar" id="progBar"></div></div>
+  <label class="mark-toggle"><input type="checkbox" id="markChk"> Mark for review</label>
+</div>
+
+<div class="stage" id="stage"><!-- views injected here --></div>
+
+<!-- ===== INTRO VIEW ===== -->
+<template id="tpl-intro">
+  <div class="intro-hero">
+    <div class="eyebrow">ServiceNow Certified Implementation Specialist</div>
+    <h1>Data Foundations: <span>CMDB &amp; CSDM</span></h1>
+    <p class="sub">Practice examination delivered in the official ServiceNow / Pearson VUE format. This is a timed assessment drawn at random from a validated question bank. Read the candidate agreement below before you begin.</p>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><div class="v">75</div><div class="l">Scored Questions</div></div>
+    <div class="fact"><div class="v">90 min</div><div class="l">Time Limit</div></div>
+    <div class="fact"><div class="v">70%</div><div class="l">Passing Score</div></div>
+    <div class="fact"><div class="v" id="bankCount">—</div><div class="l">Bank Size</div></div>
+  </div>
+
+  <div class="card agreement">
+    <h2>Candidate Agreement &amp; Examination Rules</h2>
+
+    <div class="nda">
+      <p style="margin:0"><strong>Non-Disclosure Agreement.</strong> The contents of this examination are confidential. By proceeding you agree not to disclose, reproduce, distribute, or discuss any examination item, answer, or response in whole or in part, by any means, with any individual or entity. This practice instrument is provided for personal preparation only.</p>
+    </div>
+
+    <h3>Examination format</h3>
+    <ul>
+      <li>The exam consists of <strong>75 questions</strong> selected at random from the question bank. No two sittings are guaranteed to be identical.</li>
+      <li>You have <strong>90 minutes</strong> to complete all questions. The countdown timer is displayed at the top of the screen at all times.</li>
+      <li>Items are <strong>multiple choice</strong> (single answer) or <strong>multiple response</strong> (select all that apply). Multiple-response items state the number of selections required.</li>
+      <li>A passing result requires a score of <strong>70% or higher</strong> (53 of 75 correct).</li>
+    </ul>
+
+    <h3>Rules of conduct</h3>
+    <ul>
+      <li>You may navigate freely between questions using <em>Next</em> and <em>Previous</em>, and may flag items with <em>Mark for review</em>.</li>
+      <li>Unanswered items are scored as incorrect. There is no penalty for guessing.</li>
+      <li>The examination ends automatically when the timer reaches zero; all responses recorded up to that point are submitted.</li>
+      <li>You may end and submit the examination at any time from the review screen.</li>
+    </ul>
+
+    <h3>Scoring &amp; results</h3>
+    <ul>
+      <li>Upon submission you will receive a pass/fail result, your overall score, and an item-by-item review showing the correct response for every question.</li>
+    </ul>
+
+    <label class="consent"><input type="checkbox" id="agreeChk">
+      <span>I have read and agree to the Candidate Agreement and Examination Rules stated above, and I consent to begin the examination under timed conditions.</span></label>
+
+    <div class="btn-row" style="margin-top:1.25rem">
+      <button class="btn btn-primary" id="beginBtn" disabled>Begin Examination</button>
+    </div>
+  </div>
+</template>
+
+<!-- ===== QUESTION VIEW ===== -->
+<template id="tpl-question">
+  <div class="card q-card">
+    <div class="q-num" id="qNum"></div>
+    <div class="q-stem" id="qStem"></div>
+    <div class="q-hint hidden" id="qHint"></div>
+    <div id="qOptions"></div>
+  </div>
+  <div class="q-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="reviewBtn">Review all</button>
+      <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+    </div>
+  </div>
+  <div class="card navgrid-wrap" style="padding:1.25rem">
+    <h3>Question navigator</h3>
+    <div class="navgrid" id="navGrid"></div>
+    <div class="legend">
+      <span><span class="sw a"></span> Answered</span>
+      <span><span class="sw"></span> Not answered</span>
+      <span><span class="sw m"></span> Marked for review</span>
+    </div>
+    <div class="btn-row" style="margin-top:1.25rem;justify-content:flex-end">
+      <button class="btn btn-dark" id="endBtn">End examination</button>
+    </div>
+  </div>
+</template>
+
+<!-- ===== RESULTS VIEW ===== -->
+<template id="tpl-results">
+  <div class="result-hero" id="resultHero">
+    <div class="result-badge" id="resultBadge"></div>
+    <div class="score-big" id="scorePct"></div>
+    <div class="score-sub" id="scoreSub"></div>
+  </div>
+  <div class="result-stats">
+    <div class="rstat"><div class="v ok" id="stCorrect"></div><div class="l">Correct</div></div>
+    <div class="rstat"><div class="v no" id="stWrong"></div><div class="l">Incorrect</div></div>
+    <div class="rstat"><div class="v sk" id="stSkip"></div><div class="l">Unanswered</div></div>
+    <div class="rstat"><div class="v" id="stTime"></div><div class="l">Time Used</div></div>
+  </div>
+
+  <h2 style="font-size:1.15rem;font-weight:700;color:var(--infinite-blue);margin-bottom:.9rem">Item review</h2>
+  <div class="review-filters">
+    <button class="filter-btn active" data-f="all">All</button>
+    <button class="filter-btn" data-f="incorrect">Incorrect</button>
+    <button class="filter-btn" data-f="correct">Correct</button>
+    <button class="filter-btn" data-f="skipped">Unanswered</button>
+  </div>
+  <div id="reviewList"></div>
+
+  <div class="btn-row" style="margin-top:1.5rem;justify-content:center">
+    <button class="btn btn-primary" id="retakeBtn">Take a new examination</button>
+  </div>
+</template>
+
+<footer class="site-footer">
+  <div class="contact">For any questions or concerns regarding this examination, please contact <b>Jose Aguilar</b>.</div>
+  <div class="fine">ServiceNow Certified Implementation Specialist — Data Foundations: CMDB &amp; CSDM. Practice instrument for personal preparation. Not affiliated with or endorsed by ServiceNow, Inc.</div>
+</footer>
+
+<script>
+const BANK = [{"id": 1, "stem": "A CMDB Administrator has built a number of Technology Management Service Offerings (Technical Service Offerings) based on Dynamic CI Groups to better maintain group alignment for the member CI. Which Groups are synced to CIs from the offering that has a relationship to a Dynamic CI Group? (Choose two.)", "options": [{"letter": "A", "text": "Approval Group"}, {"letter": "B", "text": "Managed by Group"}, {"letter": "C", "text": "Support Group"}, {"letter": "D", "text": "Owned by Group"}], "correct": ["B", "C"], "multi": true}, {"id": 3, "stem": "A new custom class is needed to reflect a new application being managed in the CMDB. Which roles are minimally needed to add this custom CI class?", "options": [{"letter": "A", "text": "A cmdb_inst_admin and personalize_form"}, {"letter": "B", "text": "itil_admin and personalize_form"}, {"letter": "C", "text": "data_classification_admin and personalize_dictionary"}, {"letter": "D", "text": "sn_cmdb_admin and personalize_dictionary"}], "correct": ["D"], "multi": false}, {"id": 4, "stem": "What is the relationship between an application and a server?", "options": [{"letter": "A", "text": "Application>Used by::Uses>Server"}, {"letter": "B", "text": "Application> Uses::Used by>Server"}, {"letter": "C", "text": "Application>Runs::Runs On>Server"}, {"letter": "D", "text": "Application>Runs on::Runs>Server"}], "correct": ["D"], "multi": false}, {"id": 5, "stem": "User endpoint devices are imported into the CMDB and populate the 'Assigned to' [assigned_to] field on the Computer [cmdb_ci_computer] CI. The Asset team puts in a request for the Configuration Analysts to populate the 'Assigned to' field on the related Asset. What action does a Configuration Analyst take to achieve this in an automated way?", "options": [{"letter": "A", "text": "Use the Asset-CI Field Mapping module to create a new rule to replicate the 'Assigned to' value between the asset and associated CI"}, {"letter": "B", "text": "Hide the 'Assigned to' field on the asset record and create a new field that dot walks to the related CI to get the 'Assigned to' value"}, {"letter": "C", "text": "Configure a business rule on the computer table to use a script to populate the 'Assigned to' filed on the asset based on insert or update in the computer class 'Assigned to' field"}], "correct": ["A"], "multi": false}, {"id": 6, "stem": "A CMDB Administrator needs to create a new CI class for the Internet of Things (IoT) Sensor in ServiceNow. What are the recommended practices for this specific activity? (Choose two.)", "options": [{"letter": "A", "text": "Add a new class under an appropriate parent class"}, {"letter": "B", "text": "Modify an existing class"}, {"letter": "C", "text": "Install or update the CMDB CI Class Models store application, and verify the class does not already exist"}, {"letter": "D", "text": "Delete an unused class, and replace it with the new one"}], "correct": ["A", "C"], "multi": true}, {"id": 7, "stem": "A Change Manager aims to streamline ITSM processes by automatically populating fields on the Change form when a CI is selected. The Configuration Management team is working to ensure that the Change Group field is populated for all managed CIs. As a result, which base system field on the incident form will be automatically populated after selecting a CI?", "options": [{"letter": "A", "text": "Managed by group"}, {"letter": "B", "text": "Approval group"}, {"letter": "C", "text": "Assignment group"}, {"letter": "D", "text": "Change group"}], "correct": ["C"], "multi": false}, {"id": 8, "stem": "A Data Center Manager is working with the CMDB CI Class Manager to define the relationship between Application Servers and the Applications they host. The company has multiple Application Servers that host one or more Applications. Which describes the relationship between the Application Server table ([cmdb_ci_app_server]) and the Application table ([cmdb_ci_appl])?", "options": [{"letter": "A", "text": "Many-to-one"}, {"letter": "B", "text": "One-to-one"}, {"letter": "C", "text": "One-to-many"}, {"letter": "D", "text": "Many-to-many"}], "correct": ["D"], "multi": false}, {"id": 9, "stem": "A CMDB Administrator needs to identify which attributes have been created specifically for the Windows Server class. Which tab in the Attributes section is used?", "options": [{"letter": "A", "text": "All"}, {"letter": "B", "text": "Derived"}, {"letter": "C", "text": "Added"}, {"letter": "D", "text": "Child"}], "correct": ["C"], "multi": false}, {"id": 10, "stem": "An Asset Manager wants to ensure that Asset records and CI records are kept synchronized automatically. How does the Manager do this? (Choose two.)", "options": [{"letter": "A", "text": "Ensure one-to-one physical mapping between Asset and CI"}, {"letter": "B", "text": "Ensure that scheduled jobs are run during off-business hours to ensure sync happens"}, {"letter": "C", "text": "Ensure that the business rule to update Asset fields on change on the CI table is active"}, {"letter": "D", "text": "Ensure that the business rule to update CI fields on change on the asset table is active"}], "correct": ["C", "D"], "multi": true}, {"id": 11, "stem": "The CMDB Configuration Management team has successfully developed a healthy and trusted CMDB. They have integrated discovered infrastructure data, accurately referenced non-discoverable data (such as change and support group information), and made the CMDB service-aware using Service Mapping. Which field on an Incident form is automatically populated after a CI is selected that references an appropriate support group?", "options": [{"letter": "A", "text": "Support Group"}, {"letter": "B", "text": "Approval Group"}, {"letter": "C", "text": "Change Group"}, {"letter": "D", "text": "Assignment Group"}, {"letter": "E", "text": "Managed by Group"}], "correct": ["D"], "multi": false}, {"id": 12, "stem": "A Configuration Management Process Owner is preparing solution options for presentation to the technical governance board for ingesting custom CIs to the CMDB. The solution needs to align with best practice, minimize the cost of future work (technical debt) and ensure compliance with future upgrades. Which solutions accomplish this? (Choose two.)", "options": [{"letter": "A", "text": "Repurposing a base CI class and rename attributes, as required"}, {"letter": "B", "text": "Extending an existing CI class table to accommodate the custom CI class attributes"}, {"letter": "C", "text": "Installing or upgrading the 'CMDB CI Class Models' store application to find a suitable existing CI class accommodating any new attributes"}, {"letter": "D", "text": "Extending an existing Asset class table to accommodate the custom CI class attributes"}], "correct": ["B", "C"], "multi": true}, {"id": 13, "stem": "A CMDB Administrator wants only the CIs of Principal Classes to appear in CI reference fields, for example the CI reference fields accessible from an Incident Form. Where does the CMDB Administrator designate Principal Classes?", "options": [{"letter": "A", "text": "CI Class Manager"}, {"letter": "B", "text": "CMDB Workspace"}, {"letter": "C", "text": "CMDB Data Manager"}, {"letter": "D", "text": "System Properties"}], "correct": ["A"], "multi": false}, {"id": 14, "stem": "What ensures data volume in the CMDB is manageable?", "options": [{"letter": "A", "text": "Business Rules"}, {"letter": "B", "text": "Scheduled Jobs"}, {"letter": "C", "text": "Archive Policies"}], "correct": ["C"], "multi": false}, {"id": 15, "stem": "A healthcare provider faces a critical incident affecting its patient management system. The provider needs to identify the users impacted to mitigate disruption effectively. Which CSDM-related data should they leverage?", "options": [{"letter": "A", "text": "Incident history of similar Cis"}, {"letter": "B", "text": "Service Offerings by Department or Location"}, {"letter": "C", "text": "Service environment attribute"}, {"letter": "D", "text": "Affected CI [task_ci] related list"}], "correct": ["B"], "multi": false}, {"id": 16, "stem": "The following Reconciliation Rules were configured for ServiceNow, Altiris, and SCCM: Which are true? (Choose two.)", "options": [{"letter": "A", "text": "Data collected with a discovery source of SCCM can update any record in the Windows Server [cmdb_ci_win_server] table because it has the highest priority number."}, {"letter": "B", "text": "Data collected with a discovery source of ServiceNow can insert new records into the Windows Server [cmdb_ci_win_server] table, but cannot update records created by Altiris or SCCM."}, {"letter": "C", "text": "Data collected with a discovery source of Altiris can update records inserted by SCCM into the Windows Server [cmdb_ci_win_server] table."}, {"letter": "D", "text": "Data collected with a discovery source of SCCM can be inserted as new records in the Windows Server [cmdb_ci_win_server] table."}], "correct": ["C", "D"], "multi": true}, {"id": 17, "stem": "Which type of CMDB Data Manager policy creates tasks that allow the assigned individual to update fields on the CI record?", "options": [{"letter": "A", "text": "Compliance"}, {"letter": "B", "text": "Certification"}, {"letter": "C", "text": "Attestation"}, {"letter": "D", "text": "Audit"}], "correct": ["B"], "multi": false}, {"id": 19, "stem": "A Configuration Manager needs to leverage a policy type to automate the creation and assignment of tasks to validate the existence of CIs. Which policy type should be used to accomplish this goal?", "options": [{"letter": "A", "text": "Retire"}, {"letter": "B", "text": "Certification"}, {"letter": "C", "text": "Delete"}, {"letter": "D", "text": "Attestation"}], "correct": ["D"], "multi": false}, {"id": 20, "stem": "Which is a purpose or requirement of CMDB Data Manager in ServiceNow?", "options": [{"letter": "A", "text": "Encrypts archived records for enhanced security"}, {"letter": "B", "text": "Automates the enforcement of relationship rules between CIs in the CMDB"}, {"letter": "C", "text": "Automates the archival and deletion of records based on retention policies"}], "correct": ["C"], "multi": false}, {"id": 21, "stem": "Which CSDM domain contains the Technical Service used to deliver shared infrastructure capabilities?", "options": [{"letter": "A", "text": "Consume Domain"}, {"letter": "B", "text": "Foundation Domain"}, {"letter": "C", "text": "Manage Technical Services Domain"}, {"letter": "D", "text": "Design Domain"}], "correct": ["C"], "multi": false}, {"id": 22, "stem": "Which of the following modules can be used to define incident priority rules?", "options": [{"letter": "A", "text": "System Policy > Rules > Priority Lookup Rules"}, {"letter": "B", "text": "System Policy > Rules > Data Lookup Definitions"}, {"letter": "C", "text": "System Policies > Rules > Incident Priority Lookup"}, {"letter": "D", "text": "System Policies > Rules > Incident Priority Rules"}], "correct": ["A"], "multi": false}, {"id": 23, "stem": "A CMDB Administrator wants to ensure that only relevant CIs from managed classes will be shown on Incident, Problem, and Change records. Which checkbox needs to be checked in the CI Class Manager for the CMDB Administrator to achieve the requested result?", "options": [{"letter": "A", "text": "Principal Class"}, {"letter": "B", "text": "Independent"}, {"letter": "C", "text": "Main Record"}, {"letter": "D", "text": "Extensible"}], "correct": ["A"], "multi": false}, {"id": 24, "stem": "A Configuration Manager is managing a CI class in the CMDB. The identification rule(s) needs an update. Where can the Configuration Manager view and configure the existing identification rule(s) for the class? (Choose two.)", "options": [{"letter": "A", "text": "CI Identifiers module"}, {"letter": "B", "text": "API Integrations"}, {"letter": "C", "text": "IRE Application"}, {"letter": "D", "text": "CI Class Manager"}], "correct": ["A", "D"], "multi": true}, {"id": 25, "stem": "A Configuration Management team has decided to start taking advantage of the CMDB 360/Multisource CMDB functionality. Which system property must be enabled?", "options": [{"letter": "A", "text": "glide.identification_engine.multisource_enabled"}, {"letter": "B", "text": "glide.identification_engine.multisource.query.max.limit"}, {"letter": "C", "text": "glide.identification_engine.multisource_non_cmdb_ci_enabled"}, {"letter": "D", "text": "glide.identification_engine.multisource_cmdb_ci_enabled"}], "correct": ["A"], "multi": false}, {"id": 26, "stem": "A CMDB Administrator is creating technical documentation for stakeholders, which includes a list of attributes, Identification and Reconciliation Engine (IRE) rules, and suggested relationships for several classes. Which central location does the CMDB Administrator use to collect this information?", "options": [{"letter": "A", "text": "CI Class Manager"}, {"letter": "B", "text": "CI Identifiers"}, {"letter": "C", "text": "CMDB Workspace"}, {"letter": "D", "text": "CMDB Data Manager"}], "correct": ["A"], "multi": false}, {"id": 27, "stem": "A CMDB Administrator wants to configure IRE rules for the CMDB. The CMDB Administrator opens CI Class Manager and sees the Health Inclusions Rules tab available under a CI Class. How are these rules utilized by the IRE?", "options": [{"letter": "A", "text": "To narrow the scope of CIs included in the identification process"}, {"letter": "B", "text": "To reduce the data ingested into the CMDB"}, {"letter": "C", "text": "To reconcile specific attributes based on data sources"}], "correct": ["A"], "multi": false}, {"id": 28, "stem": "A Windows administration team wants a grouping of CIs using CMDB groups. Which methods can be used? (Choose two.)", "options": [{"letter": "A", "text": "Tag-based queries"}, {"letter": "B", "text": "Scripted queries"}, {"letter": "C", "text": "Saved queries"}, {"letter": "D", "text": "Encoded queries"}], "correct": ["C", "D"], "multi": true}, {"id": 29, "stem": "A CMDB Administrator is managing group data from both the CI Class Manager and a Technical Service Offering for a specific class. Cl Class Manager: - Managed by Group = Enterprise IT Services Technical Service Offering: - Managed by Group = Windows Support - Change Group = Change Management Team What would be the Managed By Group for CIs from this class based on the configured values?", "options": [{"letter": "A", "text": "Windows Support"}, {"letter": "B", "text": "Enterprise IT Services"}, {"letter": "C", "text": "Change Management Team"}], "correct": ["A"], "multi": false}, {"id": 30, "stem": "Which is a purpose or requirement of CMDB Data Manager in ServiceNow?", "options": [{"letter": "A", "text": "Encrypts archived records for enhanced security"}, {"letter": "B", "text": "Automates the enforcement of relationship rules between CIs in the CMDB"}, {"letter": "C", "text": "Automates the archival and deletion of records based on retention policies"}], "correct": ["C"], "multi": false}, {"id": 31, "stem": "A CMDB Data Manager needs to access the ServiceNow platform to create, publish, and manage policies that automate and govern CI lifecycle operations, ensuring the CMDB remains healthy and efficient. Where can the Data Manager do this?", "options": [{"letter": "A", "text": "CMDB Workspace Management tab"}, {"letter": "B", "text": "Service Operations Workspace"}, {"letter": "C", "text": "CMDB Workspace CMDB 360 tab"}, {"letter": "D", "text": "CI Class Manager"}], "correct": ["A"], "multi": false}, {"id": 32, "stem": "A Configuration Manager needs to restrict the number of classes available in a Configuration Item reference field on an incident form. How does the Manager set Principal Classes?", "options": [{"letter": "A", "text": "By using the Principal Class check box on the CI Class Manager's 'Basic Info' tab for a Class"}, {"letter": "B", "text": "By using the Principal Class check box on the CI Class Manager's 'Attributes' tab for a Class"}, {"letter": "C", "text": "By using the Principal Class attribute on the CI"}, {"letter": "D", "text": "By using the Principal Class check box on the CMDB Workspace"}], "correct": ["A"], "multi": false}, {"id": 33, "stem": "A CMDB Administrator has taken over management of a ServiceNow instance and has determined there are multiple deficiencies in the CMDB. During review of the CMDB Data Foundations Dashboard, the Administrator sees that ServiceNow offers Remediation Playbooks. How can Playbooks assist the Administrator in resolving these issues?", "options": [{"letter": "A", "text": "Playbooks can be installed in the instance to automatically fix issues."}, {"letter": "B", "text": "Playbooks can help analyze and fix issues."}, {"letter": "C", "text": "Playbooks can automatically track common CMDB issues and output metrics."}], "correct": ["B"], "multi": false}, {"id": 34, "stem": "A CMDB Administrator utilizing the CMDB Data Foundations Dashboard sees an issue and wants to run a playbook. Which types of documentation can they expect to be provided in a playbook? (Choose two.)", "options": [{"letter": "A", "text": "Root Cause"}, {"letter": "B", "text": "Automated Remediations"}, {"letter": "C", "text": "Problem Analysis"}, {"letter": "D", "text": "Problem Overview"}], "correct": ["A", "C"], "multi": true}, {"id": 35, "stem": "A ServiceNow Administrator needs to create multiple new classes in the CMDB but wants to follow ServiceNow's best practices for naming CMDB tables to prevent technical debt. Which is the starting prefix for all custom CMDB tables?", "options": [{"letter": "A", "text": "ci_cmdb"}, {"letter": "B", "text": "cmdb_ci"}, {"letter": "C", "text": "u_cmdb_ci"}, {"letter": "D", "text": "u_ci_cmdb"}], "correct": ["C"], "multi": false}, {"id": 36, "stem": "A CSDM Data Manager needs metrics on the alignment of Technology Management Services (Technical Services) and Technology Management Offerings (Technical Service Offerings) with best practices. Which tab in the CSDM Data Foundation Dashboard provides this information?", "options": [{"letter": "A", "text": "Crawl"}, {"letter": "B", "text": "Run"}, {"letter": "C", "text": "Walk"}, {"letter": "D", "text": "Fly"}], "correct": ["C"], "multi": false}, {"id": 37, "stem": "A data center has many servers. The CMDB Administrator wants to confirm that all servers exist. Which Data Manager policy type does the Administrator implement?", "options": [{"letter": "A", "text": "Attestation"}, {"letter": "B", "text": "Certification"}, {"letter": "C", "text": "Promotion"}, {"letter": "D", "text": "Verification"}], "correct": ["A"], "multi": false}, {"id": 38, "stem": "Using existing baseline Data Manager policies, what condition must a CI meet before it can be archived or deleted?", "options": [{"letter": "A", "text": "Be fully operational and in use"}, {"letter": "B", "text": "Be marked as critical"}, {"letter": "C", "text": "Be retired and in end of life"}, {"letter": "D", "text": "Be marked as inactive"}], "correct": ["C"], "multi": false}, {"id": 39, "stem": "A CMDB Data Owner has requested belter insights on the different data sources that make up the CMDB data set. The Platform Owner knows that the new Service Graph Connector Central plugin is just what is needed. After installing the plugin, what workspace will have the new Service Graph Connector Central tab available?", "options": [{"letter": "A", "text": "Discovery Admin Workspace"}, {"letter": "B", "text": "CMDB Workspace"}, {"letter": "C", "text": "Service Graph Connector Workspace"}], "correct": ["B"], "multi": false}, {"id": 40, "stem": "An organization is updating the CMDB to include new asset types like IoT devices. Relevant CI classes need to be added and outdated ones need to be removed from the Principal Class filter to ensure accurate display in ITSM processes. Which roles are needed to add or remove classes? (Choose two.)", "options": [{"letter": "A", "text": "personalize_dictionary"}, {"letter": "B", "text": "sn_csdm_admin"}, {"letter": "C", "text": "sn_cmdb_admin"}, {"letter": "D", "text": "cmdb_query_builder"}], "correct": ["A", "C"], "multi": true}, {"id": 41, "stem": "A CMDB Manager wants to start adding CSDM design and planning (design) domain components into the CMDB. Who is involved in this exercise? (Choose two.)", "options": [{"letter": "A", "text": "Application Service Owner"}, {"letter": "B", "text": "Enterprise Architect"}, {"letter": "C", "text": "Business Relationship Manager"}, {"letter": "D", "text": "Application Owner"}], "correct": ["B", "C"], "multi": true}, {"id": 42, "stem": "The ITSM Manager wants to use Technology Management Offerings (Technical Service Offerings) to populate the support group of associated CIs. What CSDM stage would this be completed in?", "options": [{"letter": "A", "text": "Run"}, {"letter": "B", "text": "Walk"}, {"letter": "C", "text": "Foundation"}, {"letter": "D", "text": "Fly"}, {"letter": "E", "text": "Crawl"}], "correct": ["B"], "multi": false}, {"id": 43, "stem": "Which default user groups are available when setting up a CMDB Data Manager policy and specifying the task assignment with the Assignment type set to 'User Group Field'? (Choose two.)", "options": [{"letter": "A", "text": "Owned by Group"}, {"letter": "B", "text": "Assignment Group"}, {"letter": "C", "text": "Managed By Group"}, {"letter": "D", "text": "Support Group"}], "correct": ["C", "D"], "multi": true}, {"id": 44, "stem": "During a CMDB implementation, a team member is tasked with ensuring the accuracy and completeness of CI data. This person is also responsible for maintaining data quality and resolving discrepancies. Which role is responsible for these tasks?", "options": [{"letter": "A", "text": "CMDB Architect"}, {"letter": "B", "text": "IT Asset Manager"}, {"letter": "C", "text": "Configuration Manager"}, {"letter": "D", "text": "Service Owner"}], "correct": ["C"], "multi": false}, {"id": 45, "stem": "A CMDB Administrator group aims to establish a process for receiving task notifications when the Support Group or Managed By Group fields are not populated for operational Linux servers stored in the CMDB. Which ServiceNow modules can be leveraged to configure recommended fields and generate task records in cases where these fields are missing for Linux servers in the CMDB?", "options": [{"letter": "A", "text": "CMDB Workspace and Scheduled Jobs"}, {"letter": "B", "text": "Technical Service Offerings and Dynamic CI groups"}, {"letter": "C", "text": "Dynamic CI groups and CMDB groups"}, {"letter": "D", "text": "CI Class Manager and Health Preferences"}], "correct": ["D"], "multi": false}, {"id": 46, "stem": "CMDB Administrator wants to leverage the Staleness metric from the CMDB Health Dashboard - Correctness Scorecard. What is the default duration of this metric?", "options": [{"letter": "A", "text": "30 days"}, {"letter": "B", "text": "24 hours"}, {"letter": "C", "text": "7 days"}, {"letter": "D", "text": "60 days"}], "correct": ["D"], "multi": false}, {"id": 47, "stem": "A Configuration Manager responsible for a specific region wants to use the CMDB Health Dashboard to improve the data quality of the CMDB for that region. The Configuration Manager only sees the overall score and grouped by CI Class. How can the Configuration Manager get a score for regionally relevant CIs?", "options": [{"letter": "A", "text": "On the CMDB health settings, activate the option, Group scores by region"}, {"letter": "B", "text": "Customize the CMDB Health Dashboard scheduled jobs to group the results by region"}, {"letter": "C", "text": "Create CMDB groups with type, health, by region"}], "correct": ["C"], "multi": false}, {"id": 48, "stem": "Where does a user with the appropriate role(s) review and manage the generated tasks after configuring CMDB Data Manager policies?", "options": [{"letter": "A", "text": "CMDB Health Dashboard > Duplicate CIs tab"}, {"letter": "B", "text": "CMDB Workspace > My Work tab"}, {"letter": "C", "text": "CMDB Health Dashboard > Audit tab"}, {"letter": "D", "text": "CMDB Workspace > Management tab"}], "correct": ["B"], "multi": false}, {"id": 49, "stem": "A Platform Data Owner wants to improve data quality with a few reconciliation rules across the five discovery sources that are being used. The Data Owner knows the best option is to include CMDB 360/Multisource CMDB to manage and monitor discovery sources, but the company currently does not have a license for ITOM Discovery that is required for CMDB 360/Multisource CMDB. What can the Data Owner do in this case?", "options": [{"letter": "A", "text": "ITOM Discovery needs to be purchased to take advantage of the multisource IRE Rules."}, {"letter": "B", "text": "CMBD 360/Multisource is a platform product that can be used immediately."}, {"letter": "C", "text": "The IRE reconciliation rules can use discovery source regardless of CMDB 360 being enabled."}], "correct": ["C"], "multi": false}, {"id": 50, "stem": "A CMDB Administrator needs to import external data into the CMDB. To reduce the risk of creating duplicates and prevent updates from unauthorized sources, it must be ensured that the Identification and Reconciliation Engine (IRE)is not bypassed. What is the recommended method to import data into the CMDB utilizing the Identification and Reconciliation API?", "options": [{"letter": "A", "text": "IntegrationHub ETL"}, {"letter": "B", "text": "Table API (REST API or SOAP API)"}, {"letter": "C", "text": "Import Sets and Transform Maps"}], "correct": ["A"], "multi": false}, {"id": 51, "stem": "The CMDB Administrator has set-up two Dynamic Reconcilliation Rules within the ServiceNow Production Instance. The 'Server' class has a Dynamic Reconciliation Rule of largest value for the RAM field. The 'Windows Server' class has a Dynamic Reconciliation Rule of most reported for the RAM field. Given the above data in the Multisource CMDB, which value would be added to the CMDB for RAM for a 'Server' CI?", "options": [{"letter": "A", "text": "4.096 MB"}, {"letter": "B", "text": "8.192 MB"}, {"letter": "C", "text": "2.048 MB"}, {"letter": "A", "text": "Correctness"}, {"letter": "B", "text": "Compliance"}, {"letter": "C", "text": "Completeness"}], "correct": ["B"], "multi": false}, {"id": 54, "stem": "In a company there is a need to understand the CSDM maturity level needed. Different stakeholders listed a number of use cases that they expect over time. Which use case requires information objects?", "options": [{"letter": "A", "text": "The Event Operations team wants to automate their events into incident for operational actions."}, {"letter": "B", "text": "The Business Service Management team wants to understand the operational impact for their consumer parties."}, {"letter": "C", "text": "The Customer Service team wants to onboard pro-active case management."}, {"letter": "D", "text": "The SecOps team wants to understand the operational risk in the Business Application context."}, {"letter": "E", "text": "The Asset Management wants to understand to asset life cycle compliancy in a Business Application context."}], "correct": ["D"], "multi": false}, {"id": 55, "stem": "A CMDB Administrator needs to import external data into the CMDB. As the CMDB Administrator wants to reduce the risk for creating duplicates and to update information from unauthorized sources, it has to be ensured that the Identification and Reconciliation API will not be bypassed. What is the recommended method to import data into the CMDB utilizing the Identification and Reconciliation API?", "options": [{"letter": "A", "text": "IntegrationHub ETL"}, {"letter": "B", "text": "Table API (REST API or SOAP API)"}, {"letter": "C", "text": "Import Sets and Transform Maps"}], "correct": ["A"], "multi": false}, {"id": 57, "stem": "Where can a CMDB 360/Multisource CMDB Saved Query be viewed and created in the CMDB Workspace?", "options": [{"letter": "A", "text": "Saved queries window on the Insight tab"}, {"letter": "B", "text": "CMDB Query Builder"}, {"letter": "C", "text": "Coverage window on the CMDB 360 tab"}, {"letter": "D", "text": "Saved queries window on the CMDB 360 tab"}], "correct": ["D"], "multi": false}, {"id": 58, "stem": "A Platform Owner is collaborating with stakeholders in the manufacturing industry to align their CIs with the CSDM 5 framework. They need to map production line monitoring systems to the appropriate CSDM domain. Which CSDM 5 domain does the Platform Owner use?", "options": [{"letter": "A", "text": "Build and Integration (Build)"}, {"letter": "B", "text": "Service Delivery (Manage Technical)"}, {"letter": "C", "text": "Service Consumption (Sell/Consume)"}, {"letter": "D", "text": "Design and Planning (Design)"}, {"letter": "E", "text": "Foundation"}], "correct": ["B"], "multi": false}, {"id": 59, "stem": "Configuration Manager has configured a multiple data sources which are all authorized to update the same class and the same set of class attributes in the CMDB. What can the Configuration Manager do to control which data source should be authoritative source of truth for a specific class of set of class attributes?", "options": [{"letter": "A", "text": "Assign a priority to each data source in the reconciliation rules"}, {"letter": "B", "text": "Manually run the data source updates in the correct order"}, {"letter": "C", "text": "Configure data refresh rules with a specific time period"}, {"letter": "D", "text": "Assign a run order to each data source in the identification rules"}], "correct": ["A"], "multi": false}, {"id": 60, "stem": "A CMDB Administrator is asked to clean up the CMDB duplicates. What is the preferred way to manage this task?", "options": [{"letter": "A", "text": "My Tasks in the Application Navigator"}, {"letter": "B", "text": "The de-duplication task module"}, {"letter": "C", "text": "The de-duplication dashboard on the CMDB workspace"}], "correct": ["C"], "multi": false}, {"id": 61, "stem": "An organization is changing data centers and needs to know the consequences of the planned changes. How can Application Service mapping be used as part of Change Management?", "options": [{"letter": "A", "text": "To understand the physical location of CIs"}, {"letter": "B", "text": "To identify which devices will go offline first"}, {"letter": "C", "text": "To understand the business impact of CIs"}], "correct": ["C"], "multi": false}, {"id": 62, "stem": "A development team is working on a project and an application will be deployed to many servers. There will be several security requirements that must be checked to adhere to lawful compliance because the application will be holding customer personal data (PII and PCI). Where in the CSDM does the development team look to store the information that will be used to satisfy the audits?", "options": [{"letter": "A", "text": "Technology Management Service Offerings (Technical Service Offerings) and Dynamic CI Groups"}, {"letter": "B", "text": "Business Applications and Information Objects"}, {"letter": "C", "text": "Customer Service Offerings and Databases"}], "correct": ["B"], "multi": false}, {"id": 63, "stem": "Which CMDB 360/Multisource CMDB the Dynamic Reconciliation Rules will also be enabled. Based on the request of the management, a CMDB Administrator has to set up multiple Dynamic Reconciliation Rules. Which are available 'Dynamic Rule Types' within the 'Create Reconciliation Rule' wizard? (Choose two.)", "options": [{"letter": "A", "text": "Last Updated"}, {"letter": "B", "text": "Smallest Value"}, {"letter": "C", "text": "Last Created"}, {"letter": "D", "text": "Most Reported"}], "correct": ["B", "D"], "multi": true}, {"id": 64, "stem": "A CMDB Administrator identifies duplicate CIs. One was created by a manual import, and the other one was created by automated discovery. The discovered CI has the latest IP address, while the manually imported CI has an accurate relationship to a critical business application. How does the Administrator use the Duplicate CI Remediator to resolve this issue?", "options": [{"letter": "A", "text": "Retain the manually imported CI, and delete the discovered CI"}, {"letter": "B", "text": "Merge the two CIs automatically, retaining all attributes from the discovered CI"}, {"letter": "C", "text": "Retain the discovered CI, but merge the relationship from the manually imported CI"}, {"letter": "D", "text": "Retain the discovered CI, and delete the manually imported CI"}], "correct": ["C"], "multi": false}, {"id": 65, "stem": "Where can an administrator perform Natural Language Queries (NLQ)?", "options": [{"letter": "A", "text": "CMDB Data Manager"}, {"letter": "B", "text": "CI Class Manager"}, {"letter": "C", "text": "CMDB Workspace"}, {"letter": "D", "text": "CMDB Health Dashboard"}], "correct": ["C"], "multi": false}, {"id": 66, "stem": "A customer's CMDB is aligned to the CSDM Walk stage. What benefit is provided by the CMDB?", "options": [{"letter": "A", "text": "Enables impact assessments for incident, problem, and change on Business Services"}, {"letter": "B", "text": "Improves the implementation velocity of APM Foundation for future business application rationalization"}, {"letter": "C", "text": "Allows for additional stratification of Technical team's support structure along the lines of OLAs and commitments"}], "correct": ["A"], "multi": false}, {"id": 67, "stem": "A CMDB Administrator wants to remove all Linux Servers in the organization that have not been updated in six months. Which recommended action does the Administrator take in Data Manager?", "options": [{"letter": "A", "text": "Create a business rule"}, {"letter": "B", "text": "Create an archive policy"}, {"letter": "C", "text": "Create a scheduled job"}], "correct": ["B"], "multi": false}, {"id": 68, "stem": "A healthcare provider faces a critical incident affecting its patient management system. The provider needs to determine the users impacted to mitigate disruption effectively. Which CSDM-related data should they leverage?", "options": [{"letter": "A", "text": "Incident history of similar CIs"}, {"letter": "B", "text": "Application Service environment attribute"}, {"letter": "C", "text": "Service Offerings by Department or Location"}, {"letter": "D", "text": "Affected CI [task_ci] related list"}], "correct": ["D"], "multi": false}, {"id": 69, "stem": "The following identification rule for a CI class has been defined: Two new CI records are imported into the hardware class of the CMDB: a CI1: The name of this CI record matches the name of an existing CI record in the CMDB. CI2: The IP address of this CI record matches the IP address of an existing CI record in the CMDB. Which is correct based on the identification rule and the imported CI records?", "options": [{"letter": "A", "text": "CI1 will be inserted as new record and CI2 will be updated with matching record."}, {"letter": "B", "text": "CI1 will be updated with matching record and CI2 will be inserted as new record."}, {"letter": "C", "text": "CI1 and CI2 both will be updated with matching records."}, {"letter": "D", "text": "CI1 and CI2 both will be inserted as new records."}], "correct": ["B"], "multi": false}, {"id": 70, "stem": "A customer wants recently imported server records to be automatically reclassified into more specific CMDB classes after being discovered using ServiceNow Discovery. During the discovery process, if existing Server [cmdb_ci_server] records are reclassified into the Linux [cmdb_ci_linux_server] and Windows Server [cmdb_ci_win_server] classes, which reclassification operation occurred?", "options": [{"letter": "A", "text": "Class Upgrade"}, {"letter": "B", "text": "Class Downgrade"}, {"letter": "C", "text": "Class Switch"}], "correct": ["A"], "multi": false}, {"id": 71, "stem": "The CMDB Administrator group aims to display meaningful results on the CMDB Health Dashboard Compliance Scorecard for server records that are not on the latest patch. What must be configured to achieve this goal?", "options": [{"letter": "A", "text": "Certification Policies, Data Filters, Scheduled Jobs"}, {"letter": "B", "text": "Stale, Orphan, Duplicate"}, {"letter": "C", "text": "Certification Filter, Certification Template, Audit"}, {"letter": "D", "text": "Technical Service Offerings, Dynamic CI Groups, CMDB Groups"}], "correct": ["C"], "multi": false}, {"id": 72, "stem": "A Configuration Manager wants to use the Unified Map. Where would it be accessed?", "options": [{"letter": "A", "text": "CMDB Data Manager"}, {"letter": "B", "text": "CI Class Manager"}, {"letter": "C", "text": "CMDB Workspace"}], "correct": ["C"], "multi": false}, {"id": 73, "stem": "A CMDB Administrator wants to improve data quality related to the CSDM. Which action should the Administrator take to meet this goal?", "options": [{"letter": "A", "text": "Use the default configured CMDB Health Dashboard"}, {"letter": "B", "text": "Start the ServiceNow Health Scan"}, {"letter": "C", "text": "Use the CSDM Data Foundation Dashboard"}], "correct": ["C"], "multi": false}, {"id": 74, "stem": "A Platform Data Owner wants to improve data quality with a few reconciliation rules across the five discovery sources that are being used. The Data Owner knows the best option is to include CMDB 360/Multisource CMDB to manage and monitor discovery sources, but the company currently does not have a license for ITOM Discovery that is required for CMDB 360/Multisource CMDB. What can the Data Owner do in this case?", "options": [{"letter": "A", "text": "ITOM Discovery needs to be purchased to take advantage of the multisource IRE Rules."}, {"letter": "B", "text": "CMBD 360/Multisource is a platform product that can be used immediately."}, {"letter": "C", "text": "The IRE reconciliation rules can use discovery source regardless of CMDB 360 being enabled"}], "correct": ["C"], "multi": false}, {"id": 75, "stem": "CMDB Administrator has been tasked with gathering information for a presentation to leadership. The Administrator needs to provide Duplicate CI, Orphan CI, and Stale CI metrics. Which scorecard provides this information on the CMDB Health Dashboard?", "options": [{"letter": "A", "text": "Completeness"}, {"letter": "B", "text": "Compliance"}, {"letter": "C", "text": "Correctness"}], "correct": ["C"], "multi": false}, {"id": 76, "stem": "A service owner is using Unified Map to understand to composition of a service but wants to filter out irrelevant information. Which options are available to the service owner from the filter panel? (Choose two.)", "options": [{"letter": "A", "text": "Discovery source"}, {"letter": "B", "text": "CI type"}, {"letter": "C", "text": "Business critically"}, {"letter": "D", "text": "Managed by group"}], "correct": ["A", "B"], "multi": true}, {"id": 77, "stem": "According to the Common Service Data Model (CSDM), a server team is requesting a catalog item be created for infrastructure upgrade requests. Which role is involved in initiating the request and defining requirements?", "options": [{"letter": "A", "text": "Enterprise Architecture"}, {"letter": "B", "text": "Technology Service Owners"}, {"letter": "C", "text": "Application Service Owners"}], "correct": ["B"], "multi": false}, {"id": 78, "stem": "Which ServiceNow solution creates automatic relationships?", "options": [{"letter": "A", "text": "IntegrationHub ETL"}, {"letter": "B", "text": "Discovery"}, {"letter": "C", "text": "Workflow Studio"}, {"letter": "D", "text": "Service Mapping"}], "correct": ["D"], "multi": false}, {"id": 79, "stem": "What is the difference between Data Certification and Attestation policies when managing a CI?", "options": [{"letter": "A", "text": "Attestation requires correcting specific attributes of a CI, while Data Certification tracks acknowledgement the CI still exists."}, {"letter": "B", "text": "Attestation can be scheduled, while Data Certification cannot be scheduled."}, {"letter": "C", "text": "Attestation tracks acknowledgement the CI still exists, while Data Certification requires validating specific attributes of a CI."}, {"letter": "D", "text": "Attestation can be assigned to a Group or an individual, while Data Certification can only be assigned to an individual."}], "correct": ["C"], "multi": false}, {"id": 80, "stem": "A CMDB Administrator wants to create a CMDB query to find all databases located in Seattle that are connected to application services. They also want to include incidents related to those databases. Which actions does the company take to build this query? (Choose two.)", "options": [{"letter": "A", "text": "Add to the canvas the Incident table from the Non-CMDB Tables list"}, {"letter": "B", "text": "Add a filter to the database node for location=Seattle"}, {"letter": "C", "text": "Set the relationship level to 'Up to 2nd level relationships'"}, {"letter": "D", "text": "Add property columns to the application service node"}], "correct": ["A", "B"], "multi": true}, {"id": 81, "stem": "A CMDB Administrator is evaluating whether to monitor the metrics provided on the CMDB Foundation Dashboard. Which benefits support the decision to continually monitor the results on this dashboard? (Choose two.)", "options": [{"letter": "A", "text": "Provides a list of all CIs that failed health audits"}, {"letter": "B", "text": "Provides metrics for CIs Processed by the IRE"}, {"letter": "C", "text": "Provides metrics on active CIs updated in the last 90 days"}, {"letter": "D", "text": "Reports on all orphan CIs in the CMDB"}], "correct": ["B", "C"], "multi": true}, {"id": 82, "stem": "The Apache Web Server Identification Rule is configured with the following Criterion attributes: Class - Configuration file - Version - Yesterday, an Apache Web Server CI was discovered as part of Service Mapping. Today, the application owner upgraded Apache to a different version and reran discovery of the service. What will happen in the CMDB?", "options": [{"letter": "A", "text": "The existing Apache Web Server CI will be reconciled and its version will be updated."}, {"letter": "B", "text": "A duplication error will occur."}, {"letter": "C", "text": "The Apache Web Server CI will be reclassified as a Web Server CI."}, {"letter": "D", "text": "A new Apache Web Server CI is created."}], "correct": ["D"], "multi": false}, {"id": 83, "stem": "CMDB Administrator is reviewing the health of the CMDB and notices a large percentage of the Hardware CIs are missing serial numbers. The Administrator is concerned this may cause duplicate CIs and would like to resolve the issue in a timely manner. What structured guidelines provided by ServiceNow are available to troubleshoot and resolve the issue?", "options": [{"letter": "A", "text": "CMDB Health Dashboards Playbooks"}, {"letter": "B", "text": "CSDM Now Create Playbooks"}, {"letter": "C", "text": "CMDB Data Foundations Dashboard Playbooks"}, {"letter": "D", "text": "CSDM Data Foundations Dashboard Playbooks"}], "correct": ["D"], "multi": false}, {"id": 84, "stem": "A healthcare provider faces a critical incident affecting its patient management system. The provider needs to determine the users impacted to mitigate disruption effectively. Which CSDM-related data should they leverage?", "options": [{"letter": "A", "text": "Application Service environment attribute"}, {"letter": "B", "text": "Incident history of similar CIs"}, {"letter": "C", "text": "Affected CI [task_ci] related list"}, {"letter": "D", "text": "Service Offerings by Department or Location"}], "correct": ["D"], "multi": false}, {"id": 85, "stem": "The Configuration Manager is preparing the justification to utilize the CMDB Data Foundations Dashboard. Which benefits align with the usage of this dashboard? (Choose two.)", "options": [{"letter": "A", "text": "It enables monitoring and tracking of CMDB health over time."}, {"letter": "B", "text": "It provides actionable insights to improve data quality and completeness."}, {"letter": "C", "text": "It helps detect and eliminate duplicate records in the CMDB."}, {"letter": "D", "text": "It automates the approval process for change management."}], "correct": ["D"], "multi": false}, {"id": 86, "stem": "Configuration Management needs to ensure data quality for all CIs in the CMDB. What areas of data quality for CIs are in the CMDB Health Dashboard? (Choose two.)", "options": [{"letter": "A", "text": "Missing CIs"}, {"letter": "B", "text": "State CIs"}, {"letter": "C", "text": "Duplicate CIs"}, {"letter": "D", "text": "Downgraded CIs"}, {"letter": "E", "text": "Upgraded CIs"}], "correct": ["A", "C"], "multi": true}, {"id": 87, "stem": "A Change Manager wants to gain value from CSDM. How will the Change Management process benefit from CSDM? (Choose two.)", "options": [{"letter": "A", "text": "Identify blackout windows for the change"}, {"letter": "B", "text": "Determine the root cause of the change issue"}, {"letter": "C", "text": "Understand the impact of the change on services"}, {"letter": "D", "text": "Route the change dynamically"}], "correct": ["C"], "multi": false}, {"id": 88, "stem": "An organization needs to maintain non-discoverable attributes, such as warranty expiration dates, for hardware CIs. These attributes are not updated by automated discovery tools. What method ensures these attributes are accurately maintained for all CIs?", "options": [{"letter": "A", "text": "Create a new CI class specifically for non-discoverable attributes"}, {"letter": "B", "text": "Use the CMDB Reconciliation Engine to update the attributes"}, {"letter": "C", "text": "Use a scheduled data import to update the attributes from an external source"}], "correct": ["C"], "multi": false}, {"id": 89, "stem": "A CMDB Configuration Manager is reviewing the metrics on the CMDB Health Dashboard's Correctness Scorecard for the Server class which consists of a total of 60,000 servers in the CMDB. For the Duplicate metric, it shows Healthy CIs/Evaluated as 59,000/60,000. For the Orphan metric, it shows Healthy CIs/Evaluated as 45,000/50,000. Which configuration explains the difference in the scope of Server CIs (60,000 vs.50,000) evaluated between the two metrics?", "options": [{"letter": "A", "text": "The Duplicate metric has a CMDB Group configured for the Server class."}, {"letter": "B", "text": "The Duplicate metric has a Health Inclusion rule configured for the Server class."}, {"letter": "C", "text": "The Orphan metric has a Health Inclusion rule configured for the Server class."}, {"letter": "D", "text": "The Orphan metric has a CMDB Group configured for the Server class."}], "correct": ["C"], "multi": false}, {"id": 90, "stem": "A CMDB Administrator needs insights into how their CMDB is configured according to ServiceNow recommended practice. Which should be used?", "options": [{"letter": "A", "text": "CMDB Health Dashboard"}, {"letter": "B", "text": "CMDB Workspace"}, {"letter": "C", "text": "CMDB Data Manager"}, {"letter": "D", "text": "CMDB Data Foundation Dashboard"}], "correct": ["D"], "multi": false}, {"id": 91, "stem": "Which are business values of CMDB? (Choose two.)", "options": [{"letter": "A", "text": "Collecting and managing financial data"}, {"letter": "B", "text": "Streaming incident and change management"}, {"letter": "C", "text": "Strengthening operational resiliency"}, {"letter": "D", "text": "Automating maintenance for CI relationships"}], "correct": ["B", "C"], "multi": true}, {"id": 93, "stem": "CMDB class owners are receiving tasks under the 'My Work' tab in the CMDB Workspace. Which CMDB management tool is generating these tasks?", "options": [{"letter": "A", "text": "CMDB Data Manager"}, {"letter": "B", "text": "De-duplication templates"}, {"letter": "C", "text": "CMDB Health Dashboard"}], "correct": ["A"], "multi": false}, {"id": 94, "stem": "A CMDB Administrator is implementing a Vulnerability Response or Security Incident Response and needs to ensure customers have enough context to estimate risk and set task priorities. Which Get Well Playbook from the CSDM Data Foundation Dashboard helps with this?", "options": [{"letter": "A", "text": "Locations without a Parent Location"}, {"letter": "B", "text": "Named Product Models without Product Owners"}, {"letter": "C", "text": "Percentage of Custom Status Values for CI Life Cycle Stages"}, {"letter": "D", "text": "Application Services with Business Application Relationships"}], "correct": ["D"], "multi": false}, {"id": 95, "stem": "When integrating data into the CMDB using import sets and transform maps, which type of script is added to ensure the data is processed through the IRE?", "options": [{"letter": "A", "text": "onBefore"}, {"letter": "B", "text": "onComplete"}, {"letter": "C", "text": "onStart"}, {"letter": "D", "text": "onAfter"}], "correct": ["A"], "multi": false}, {"id": 96, "stem": "What ensures data volume in the CMDB manageable?", "options": [{"letter": "A", "text": "Scheduled Jobs"}, {"letter": "B", "text": "Archive Policies"}, {"letter": "C", "text": "Business Rules"}], "correct": ["B"], "multi": false}, {"id": 97, "stem": "A CMDB Administrator wants to run the Services Have Owners Identified playbook to remediate the issues shown in the CMDB Data Foundations Dashboard. Which remediation plays would be used? (Choose two.)", "options": [{"letter": "A", "text": "Govern Data"}, {"letter": "B", "text": "Fix Data"}, {"letter": "C", "text": "Report Data"}, {"letter": "D", "text": "Analyze Data"}], "correct": ["B", "D"], "multi": true}, {"id": 98, "stem": "A CMDB Manager wants to improve data quality using the CMDB Health Dashboard. What needs to happen to generate CMDB health scores?", "options": [{"letter": "A", "text": "Nothing, CMDB health scores are calculated by default"}, {"letter": "B", "text": "The plugin, CMDB health calculation, needs to be installed"}, {"letter": "C", "text": "The scheduled jobs for the CMDB Health Dashboard must be activated"}], "correct": ["C"], "multi": false}, {"id": 99, "stem": "The following Reconciliation Rules were configured for ServiceNow, Altiris, and SCCM: Which are true? (Choose two.)", "options": [{"letter": "A", "text": "Data collected with a discovery source of SCCM can update any record in the Windows Server [cmdb_ci_win_server] table because it has the highest priority number."}, {"letter": "B", "text": "Data collected with a discovery source of ServiceNow can insert new records into the Windows Server [cmdb_ci_win_server] table, but cannot update records created by Altiris or SCCM."}, {"letter": "C", "text": "Data collected with a discovery source of Altiris can update records inserted by SCCM into the Windows Server [cmdb_ci_win_server] table."}, {"letter": "D", "text": "Data collected with a discovery source of SCCM can be inserted as new records in the Windows Server [cmdb_ci_win_server] table."}], "correct": ["C", "D"], "multi": true}, {"id": 100, "stem": "A Configuration Management Governance team is transitioning from utilizing legacy CMDB status fields to CSDM life cycle status fields. Which table can be modified?", "options": [{"letter": "A", "text": "Life Cycle Stages [life_cycle_stage]"}, {"letter": "B", "text": "Life Cycle Mapping [life_cycle_mapping]"}, {"letter": "C", "text": "Life Cycle Controls [life_cycle_control]"}, {"letter": "D", "text": "Life Cycle Stage Status [life_cycle_stage_status]"}], "correct": ["B"], "multi": false}, {"id": 101, "stem": "A CMDB Administrator has installed a Service Graph Connector and customized a script transform. What will happen on subsequent upgrades if the default definition of the script transform is updated?", "options": [{"letter": "A", "text": "A skipped change is created and no change is made the script transform definition."}, {"letter": "B", "text": "The Service Graph Connector upgrade refuses to start."}, {"letter": "C", "text": "The upgrade stops and reports an error."}], "correct": ["A"], "multi": false}, {"id": 102, "stem": "The CMDB Configuration Manager is using the CI Class Manager to manage the group ownership of CI classes and needs to leverage the ownership value specified in the CI Class Manager. When configuring a CMDB Data Manager policy, which group reference field should be set?", "options": [{"letter": "A", "text": "Change Group"}, {"letter": "B", "text": "Approval Group"}, {"letter": "C", "text": "Managed By Group"}, {"letter": "D", "text": "Support Group"}], "correct": ["C"], "multi": false}, {"id": 103, "stem": "A CMDB Administrator is comparing the Unified Map to the Service Mapping map. What are additional capabilities of the Unified Map? (Choose two.)", "options": [{"letter": "A", "text": "Number of levels displayed on a map can be modified"}, {"letter": "B", "text": "Visibility to an application and the host it is installed on"}, {"letter": "C", "text": "Map nodes can be filtered based on user preferences"}, {"letter": "D", "text": "Map can be zoomed in and out"}], "correct": ["A", "C"], "multi": true}, {"id": 104, "stem": "A CMDB Administrator, viewing the CMDB Data Foundations Dashboard, notices the Unique Locations Result percentage low. What is the recommended process from the associated playbook to correct this issue?", "options": [{"letter": "A", "text": "Review both locations, update CIs with the correct location and delete the duplicate location"}, {"letter": "B", "text": "Retain the location that matches the organization's standard naming convention, and delete the duplicate without further validation"}, {"letter": "C", "text": "Keep both locations as either can be used as a valid alternate location"}, {"letter": "D", "text": "Use the Duplicate CI Remediator the merge the duplicate location records"}], "correct": ["A"], "multi": false}, {"id": 105, "stem": "The CMDB Configuration Management team wants to manage de-duplication tasks generated from data ingested into the CMDB via the Identification and Reconciliation Engine (IRE). In which area of the CMDB Workspace can they locate these de-duplication tasks?", "options": [{"letter": "A", "text": "Important actions tile under the Home tab"}, {"letter": "B", "text": "CMDB feature adoption tile under the Insight tab"}, {"letter": "C", "text": "Total status tile under the My Work tab"}], "correct": ["A"], "multi": false}, {"id": 107, "stem": "Which type of CMDB Data Manager policy creates tasks that allow the assigned individual to update fields on the CI record?", "options": [{"letter": "A", "text": "Compliance"}, {"letter": "B", "text": "Certification"}, {"letter": "C", "text": "Attestation"}, {"letter": "D", "text": "Audit"}], "correct": ["B"], "multi": false}, {"id": 108, "stem": "A CMDB Administrator wants to educate the team on the various actions that can be performed within the CMDB Workspace. What actions can be initiated from the CMDB Workspace? (Choose two.)", "options": [{"letter": "A", "text": "Create a new CMDB class"}, {"letter": "B", "text": "Execute ServiceNow Discovery"}, {"letter": "C", "text": "Remediate duplicate CI records"}, {"letter": "D", "text": "Create a CMDB Data Manager certification policy"}], "correct": ["C", "D"], "multi": true}, {"id": 109, "stem": "A Configuration Manager is planning the implementation of the CMDB. Which is the prescribed CSDM rollout order?", "options": [{"letter": "A", "text": "Architecture, Business, Technical, Governance"}, {"letter": "B", "text": "Initiate, Plan, Execute, Deliver, Close"}, {"letter": "C", "text": "Foundation, Crawl, Walk, Run, Fly"}, {"letter": "D", "text": "Initial, Developing, Defined, Managed"}], "correct": ["C"], "multi": false}, {"id": 112, "stem": "A Configuration Manager needs to leverage a policy type to automate the creation and assignment of tasks to validate the existence of CIs. Which policy type should be used to accomplish this goal?", "options": [{"letter": "A", "text": "Retire"}, {"letter": "B", "text": "Certification"}, {"letter": "C", "text": "Delete"}, {"letter": "D", "text": "Attestation"}], "correct": ["D"], "multi": false}, {"id": 113, "stem": "A Service Portfolio Manager wants to know what Application Services their Business Service Offerings depend on. What stage of CSDM would map this relationship?", "options": [{"letter": "A", "text": "Foundation"}, {"letter": "B", "text": "Fly"}, {"letter": "C", "text": "Run"}, {"letter": "D", "text": "Walk"}, {"letter": "E", "text": "Crawl"}], "correct": ["C"], "multi": false}, {"id": 114, "stem": "Which is a purpose or requirement of CMDB Data Manager in ServiceNow?", "options": [{"letter": "A", "text": "Encrypts archived records for enhanced security"}, {"letter": "B", "text": "Automates the enforcement of relationship rules between CIs in the CMDB"}, {"letter": "C", "text": "Automates the archival and deletion of records based on retention policies"}], "correct": ["C"], "multi": false}, {"id": 115, "stem": "A CMDB Administrator wants to leverage the CMDB Data Foundations Dashboard. What are benefits of using this application?", "options": [{"letter": "A", "text": "Checks that important data is valid and properly configured"}, {"letter": "B", "text": "Has a framework to create custom metrics for the CMDB"}, {"letter": "C", "text": "Provides playbooks to assist in the remediation of potential risks"}, {"letter": "D", "text": "Uses automation to remediate potential risks"}], "correct": ["A", "C"], "multi": true}, {"id": 116, "stem": "A CMDB Data Manager needs to access the ServiceNow platform to create, publish, and manage policies that automate and govern CI lifecycle operations, ensuring the CMDB remains healthy and efficient. Where can the Data Manager do this?", "options": [{"letter": "A", "text": "CMDB Workspace Management tab"}, {"letter": "B", "text": "Service Operations Workspace"}, {"letter": "C", "text": "CMDB Workspace CMDB 360 tab"}, {"letter": "D", "text": "CI Class Manager"}], "correct": ["A"], "multi": false}, {"id": 117, "stem": "A CMDB Administrator needs to prevent duplicate CI creation from import sets that load data into the CMDB from vendor shipment files containing CI information. How can the Administrator do this?", "options": [{"letter": "A", "text": "Set the coalesce on two mappings within the transform map"}, {"letter": "B", "text": "Create comparison rules in the IRE"}, {"letter": "C", "text": "Set the system property to utilize the IRE within transform maps"}, {"letter": "D", "text": "Use the CMDBTransformUtil API in the transform script"}], "correct": ["D"], "multi": false}, {"id": 118, "stem": "A CMDB Administrator wants to ensure all short-lived CIs that have not been discovered in the past week are removed. After retiring the CI records, which recommended action does the CMDB Administrator take?", "options": [{"letter": "A", "text": "Create a delete police"}, {"letter": "B", "text": "Create a business rule"}, {"letter": "C", "text": "Create a scheduled job"}], "correct": ["A"], "multi": false}, {"id": 119, "stem": "A CMDB Administrator has taken over management of a ServiceNow instance and has determined there are multiple deficiencies in the CMDB. During review of the CMDB Data Foundations Dashboard, the Administrator sees that ServiceNow offers Remediation Playbooks. How can Playbooks assist the Administrator in resolving these issues?", "options": [{"letter": "A", "text": "Playbooks can be installed in the instance to automatically fix issues."}, {"letter": "B", "text": "Playbooks can help analyze and fix issues."}, {"letter": "C", "text": "Playbooks can automatically track common CMDB issues and output metrics."}], "correct": ["B"], "multi": false}, {"id": 120, "stem": "A CMDB Administrator utilizing the CMDB Data Foundations Dashboard sees an issue and wants to run a playbook. Which types of documentation can they expect to be provided in a playbook? (Choose two.)", "options": [{"letter": "A", "text": "Root Cause"}, {"letter": "B", "text": "Automated Remediations"}, {"letter": "C", "text": "Problem Analysis"}, {"letter": "D", "text": "Problem Overview"}], "correct": ["A", "D"], "multi": true}, {"id": 121, "stem": "The CMDB Administrator wants to leverage the Staleness metric from the CMDB Health Dashboard - Correctness Scorecard. Which field is used to calculate the duration of this metric?", "options": [{"letter": "A", "text": "Updated (sys_updated_on)"}, {"letter": "B", "text": "Created (sys_created_on)"}, {"letter": "C", "text": "Last modified on (last_modified)"}, {"letter": "D", "text": "Most recent discovery (last_discovery)"}, {"letter": "E", "text": "First discovered (first_discovered)"}], "correct": ["A"], "multi": false}, {"id": 122, "stem": "A CSDM Data Manager needs metrics on the alignment of Technology Management Services (Technical Services) and Technology Management Offerings (Technical Service Offerings) with best practices. Which tab in the CSDM Data Foundation Dashboard provides this information?", "options": [{"letter": "A", "text": "Crawl"}, {"letter": "B", "text": "Run"}, {"letter": "C", "text": "Walk"}, {"letter": "D", "text": "Fly"}], "correct": ["C"], "multi": false}, {"id": 123, "stem": "A data center has many servers. The CMDB Administrator wants to confirm that all servers exist. Which Data Manager policy type does the Administrator implement?", "options": [{"letter": "A", "text": "Attestation"}, {"letter": "B", "text": "Certification"}, {"letter": "C", "text": "Promotion"}, {"letter": "D", "text": "Verification"}], "correct": ["A"], "multi": false}, {"id": 124, "stem": "A CMDB Administrator has installed a Service Graph Connector (SGC), and then made customizations to the mappings. Which is a consequence of this action?", "options": [{"letter": "A", "text": "Fields populated by a customization will have a special tag associated with them in the CMDB."}, {"letter": "B", "text": "The customization will prevent the SGC from executing without an approval record attached to the affected mapping record."}, {"letter": "C", "text": "The customized mappings are not supported by ServiceNow, and the customer is responsible for supporting their own customized SGC."}], "correct": ["C"], "multi": false}, {"id": 125, "stem": "Using existing baseline Data Manager policies, what condition must a CI meet before it can be archived or deleted?", "options": [{"letter": "A", "text": "Be fully operational and in use"}, {"letter": "B", "text": "Be marked as critical"}, {"letter": "C", "text": "Be retired and in end of life"}, {"letter": "D", "text": "Be marked as inactive"}], "correct": ["C"], "multi": false}, {"id": 126, "stem": "The Application Portfolio Management team is asking for help modeling platforms as Business Applications. How would this be mapped in CSDM using the ServiceNow Platform in the Incident and Change applications? Incident and Change would have a reference to ServiceNow Platform. Incident and Change would be Platform Applications and have a reference to ServiceNow Platform. A Depends On relationship would be created between ServiceNow Platform and Incident and Change.", "options": [{"letter": "A", "text": "ServiceNow Platform, Incident, and Change would all be web based Architecture type."}, {"letter": "B", "text": "ServiceNow Platform would be an Architecture type of Platform Host."}, {"letter": "C", "text": "ServiceNow Platform, Incident, and Change would all be web based Architecture type."}, {"letter": "D", "text": "ServiceNow Platform would be an Architecture type of Platform Host. Incident and Change would be Platform Applications. Then a Depends On relationship would be created between ServiceNow Platform and Incident and Change."}], "correct": ["D"], "multi": false}, {"id": 127, "stem": "A CMDB Data Owner has requested belter insights on the different data sources that make up the CMDB data set. The Platform Owner knows that the new Service Graph Connector Central plugin is just what is needed. After installing the plugin, what workspace will have the new Service Graph Connector Central tab available?", "options": [{"letter": "A", "text": "Discovery Admin Workspace"}, {"letter": "B", "text": "CMDB Workspace"}, {"letter": "C", "text": "Service Graph Connector Workspace"}], "correct": ["B"], "multi": false}, {"id": 128, "stem": "The Configuration Management team wants to confirm that all servers in the CMDB actually exist in the data center. Which CMDB Data Manager policy type would the team create?", "options": [{"letter": "A", "text": "Attestation"}, {"letter": "B", "text": "Retire"}, {"letter": "C", "text": "Delete"}, {"letter": "D", "text": "Archive"}, {"letter": "E", "text": "Certification"}], "correct": ["A"], "multi": false}, {"id": 130, "stem": "A CMDB Manager wants to start adding CSDM design and planning (design) domain components into the CMDB. Who is involved in this exercise? (Choose two.)", "options": [{"letter": "A", "text": "Application Service Owner"}, {"letter": "B", "text": "Enterprise Architect"}, {"letter": "C", "text": "Business Relationship Manager"}, {"letter": "D", "text": "Application Owner"}], "correct": ["B", "C"], "multi": true}, {"id": 131, "stem": "What types of policies can be created within CMDB Data Manager? (Choose two.)", "options": [{"letter": "A", "text": "Retire"}, {"letter": "B", "text": "Reconciliation"}, {"letter": "C", "text": "De-duplication"}, {"letter": "D", "text": "Archive"}, {"letter": "A", "text": "Run"}, {"letter": "B", "text": "Walk"}, {"letter": "C", "text": "Foundation"}, {"letter": "D", "text": "Fly"}, {"letter": "E", "text": "Crawl"}], "correct": ["A", "D"], "multi": true}, {"id": 133, "stem": "Which default user groups are available when setting up a CMDB Data Manager policy and specifying the task assignment with the Assignment type set to 'User Group Field'? (Choose two.)", "options": [{"letter": "A", "text": "Owned by Group"}, {"letter": "B", "text": "Assignment Group"}, {"letter": "C", "text": "Managed By Group"}, {"letter": "D", "text": "Support Group"}], "correct": ["C", "D"], "multi": true}, {"id": 134, "stem": "During a CMDB implementation, a team member is tasked with ensuring the accuracy and completeness of CI data. This person is also responsible for maintaining data quality and resolving discrepancies. Which role is responsible for these tasks?", "options": [{"letter": "A", "text": "CMDB Architect"}, {"letter": "B", "text": "IT Asset Manager"}, {"letter": "C", "text": "Configuration Manager"}, {"letter": "D", "text": "Service Owner"}], "correct": ["C"], "multi": false}, {"id": 135, "stem": "A CMDB Administrator group aims to establish a process for receiving task notifications when the Support Group or Managed By Group fields are not populated for operational Linux servers stored in the CMDB. Which ServiceNow modules can be leveraged to configure recommended fields and generate task records in cases where these fields are missing for Linux servers in the CMDB?", "options": [{"letter": "A", "text": "CMDB Workspace and Scheduled Jobs"}, {"letter": "B", "text": "Technical Service Offerings and Dynamic CI groups"}, {"letter": "C", "text": "Dynamic CI groups and CMDB groups"}, {"letter": "D", "text": "CI Class Manager and Health Preferences"}], "correct": ["D"], "multi": false}, {"id": 136, "stem": "A CMDB Administrator wants to leverage the Staleness metric from the CMDB Health Dashboard - Correctness Scorecard. What is the default duration of this metric?", "options": [{"letter": "A", "text": "30 days"}, {"letter": "B", "text": "24 hours"}, {"letter": "C", "text": "7 days"}, {"letter": "D", "text": "60 days"}], "correct": ["D"], "multi": false}, {"id": 137, "stem": "A Configuration Manager responsible for a specific region wants to use the CMDB Health Dashboard to improve the data quality of the CMDB for that region. The Configuration Manager only sees the overall score and grouped by CI Class. How can the Configuration Manager get a score for regionally relevant CIs?", "options": [{"letter": "A", "text": "On the CMDB health settings, activate the option, Group scores by region"}, {"letter": "B", "text": "Customize the CMDB Health Dashboard scheduled jobs to group the results by region"}, {"letter": "C", "text": "Create CMDB groups with type, health, by region"}], "correct": ["C"], "multi": false}, {"id": 138, "stem": "How does a CMDB Administrator use the ServiceNow Platform to ensure the data quality associated with CIs in the CMDB?", "options": [{"letter": "A", "text": "Data Quality Scheduled Job"}, {"letter": "B", "text": "CMDB Audit Business Rule"}, {"letter": "C", "text": "CMDB Workspace"}, {"letter": "D", "text": "Data Quality Business Rule"}], "correct": ["D"], "multi": false}, {"id": 139, "stem": "Where does a user with the appropriate role(s) review and manage the generated tasks after configuring CMDB Data Manager policies?", "options": [{"letter": "A", "text": "CMDB Health Dashboard > Duplicate CIs tab"}, {"letter": "B", "text": "CMDB Workspace > My Work tab"}, {"letter": "C", "text": "CMDB Health Dashboard > Audit tab"}, {"letter": "D", "text": "CMDB Workspace > Management tab"}], "correct": ["B"], "multi": false}];
+const TOTAL_Q = Math.min(75, BANK.length);
+const TIME_LIMIT = 90 * 60;          // seconds
+const PASS_PCT = 70;
+
+const stage = document.getElementById('stage');
+const examBar = document.getElementById('examBar');
+const subBar = document.getElementById('subBar');
+
+let state = null;
+let timerId = null;
+
+/* ---------- helpers ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function mount(tplId){
+  const t = document.getElementById(tplId).content.cloneNode(true);
+  stage.innerHTML=''; stage.appendChild(t);
+}
+function fmt(sec){const m=Math.floor(sec/60),s=sec%60;return (m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
+
+/* ---------- intro ---------- */
+function showIntro(){
+  examBar.classList.add('hidden'); subBar.classList.add('hidden');
+  mount('tpl-intro');
+  document.getElementById('bankCount').textContent = BANK.length;
+  const agree = document.getElementById('agreeChk');
+  const begin = document.getElementById('beginBtn');
+  agree.addEventListener('change',()=> begin.disabled = !agree.checked);
+  begin.addEventListener('click', startExam);
+}
+
+/* ---------- start ---------- */
+function startExam(){
+  const picked = shuffle(BANK).slice(0, TOTAL_Q);
+  state = {
+    qs: picked,
+    answers: picked.map(()=>[]),     // arrays of selected letters
+    marked: picked.map(()=>false),
+    current: 0,
+    timeLeft: TIME_LIMIT,
+    submitted:false
+  };
+  examBar.classList.remove('hidden'); subBar.classList.remove('hidden');
+  startTimer();
+  renderQuestion();
+}
+
+/* ---------- timer ---------- */
+function startTimer(){
+  updateTimerUI();
+  timerId = setInterval(()=>{
+    state.timeLeft--;
+    updateTimerUI();
+    if(state.timeLeft<=0){clearInterval(timerId); submitExam(true);}
+  },1000);
+}
+function updateTimerUI(){
+  const box=document.getElementById('timerBox');
+  document.getElementById('timer').textContent = fmt(state.timeLeft);
+  box.classList.toggle('warn-time', state.timeLeft<=600 && state.timeLeft>120);
+  box.classList.toggle('crit-time', state.timeLeft<=120);
+}
+
+/* ---------- render question ---------- */
+function renderQuestion(){
+  mount('tpl-question');
+  const i = state.current, q = state.qs[i];
+  document.getElementById('qcount').textContent = `Question ${i+1} of ${state.qs.length}`;
+  document.getElementById('progBar').style.width = ((i+1)/state.qs.length*100)+'%';
+  document.getElementById('qNum').textContent = `Item ${i+1}`;
+  document.getElementById('qStem').textContent = q.stem;
+
+  const multi = q.multi;
+  const hint = document.getElementById('qHint');
+  if(multi){ hint.classList.remove('hidden'); hint.textContent = `Multiple response — select ${numWord(q.correct.length)} answer(s).`; }
+
+  const wrap = document.getElementById('qOptions');
+  q.options.forEach(o=>{
+    const lab=document.createElement('label'); lab.className='opt';
+    const inp=document.createElement('input');
+    inp.type = multi?'checkbox':'radio'; inp.name='opt'; inp.value=o.letter;
+    if(state.answers[i].includes(o.letter)){inp.checked=true; lab.classList.add('sel');}
+    inp.addEventListener('change',()=>onSelect(o.letter, multi));
+    const ltr=document.createElement('span'); ltr.className='ltr'; ltr.textContent=o.letter+'.';
+    const txt=document.createElement('span'); txt.className='txt'; txt.textContent=o.text;
+    lab.appendChild(inp); lab.appendChild(ltr); lab.appendChild(txt);
+    wrap.appendChild(lab);
+  });
+
+  // mark toggle
+  const mc=document.getElementById('markChk');
+  mc.checked = state.marked[i];
+  mc.onchange = ()=>{ state.marked[i]=mc.checked; buildNavGrid(); };
+
+  document.getElementById('prevBtn').disabled = (i===0);
+  document.getElementById('prevBtn').onclick = ()=>{ if(state.current>0){state.current--; renderQuestion();} };
+  document.getElementById('nextBtn').textContent = (i===state.qs.length-1)?'Review all':'Next \u2192';
+  document.getElementById('nextBtn').onclick = ()=>{ if(state.current<state.qs.length-1){state.current++; renderQuestion();} else {window.scrollTo(0,document.body.scrollHeight);} };
+  document.getElementById('reviewBtn').onclick = ()=> window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+  document.getElementById('endBtn').onclick = confirmEnd;
+
+  buildNavGrid();
+  window.scrollTo(0,0);
+}
+function numWord(n){return ({1:'one',2:'two',3:'three',4:'four'})[n]||n;}
+
+function onSelect(letter, multi){
+  const i=state.current;
+  if(multi){
+    const arr=state.answers[i];
+    const idx=arr.indexOf(letter);
+    if(idx>=0) arr.splice(idx,1); else arr.push(letter);
+  } else {
+    state.answers[i]=[letter];
+  }
+  // refresh selected styling
+  document.querySelectorAll('#qOptions .opt').forEach(l=>{
+    const inp=l.querySelector('input'); l.classList.toggle('sel', inp.checked);
+  });
+  buildNavGrid();
+}
+
+function buildNavGrid(){
+  const grid=document.getElementById('navGrid'); if(!grid) return;
+  grid.innerHTML='';
+  state.qs.forEach((q,idx)=>{
+    const c=document.createElement('button'); c.className='navcell'; c.textContent=idx+1;
+    if(state.answers[idx].length) c.classList.add('answered');
+    if(state.marked[idx]) c.classList.add('marked');
+    if(idx===state.current) c.classList.add('current');
+    c.onclick=()=>{ state.current=idx; renderQuestion(); };
+    grid.appendChild(c);
+  });
+}
+
+/* ---------- end / submit ---------- */
+function confirmEnd(){
+  const answered = state.answers.filter(a=>a.length).length;
+  const unanswered = state.qs.length - answered;
+  const ov=document.createElement('div'); ov.className='overlay';
+  ov.innerHTML=`<div class="modal">
+    <h2>End examination?</h2>
+    <p>Once submitted you cannot return to your answers. Your results and item review will be displayed.</p>
+    <div class="stat-line">Answered: ${answered} of ${state.qs.length} &nbsp;|&nbsp; Unanswered: ${unanswered}<br>Time remaining: ${fmt(state.timeLeft)}</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="cancelEnd">Continue exam</button>
+      <button class="btn btn-primary" id="confirmEndBtn">Submit &amp; finish</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#cancelEnd').onclick=()=>ov.remove();
+  ov.querySelector('#confirmEndBtn').onclick=()=>{ov.remove(); submitExam(false);};
+}
+
+function isCorrect(q, picked){
+  if(!picked.length) return false;
+  const a=picked.slice().sort().join(''), b=q.correct.slice().sort().join('');
+  return a===b;
+}
+
+function submitExam(auto){
+  if(state.submitted) return;
+  state.submitted=true;
+  clearInterval(timerId);
+  examBar.classList.add('hidden'); subBar.classList.add('hidden');
+
+  let correct=0, wrong=0, skipped=0;
+  state.qs.forEach((q,i)=>{
+    const p=state.answers[i];
+    if(!p.length) skipped++;
+    else if(isCorrect(q,p)) correct++;
+    else wrong++;
+  });
+  const pct = Math.round(correct/state.qs.length*100);
+  const passed = pct>=PASS_PCT;
+  const timeUsed = TIME_LIMIT - state.timeLeft;
+
+  mount('tpl-results');
+  const hero=document.getElementById('resultHero');
+  hero.classList.add(passed?'pass':'fail');
+  const badge=document.getElementById('resultBadge');
+  badge.classList.add(passed?'pass':'fail');
+  badge.textContent = passed?'Result: Pass':'Result: Fail';
+  document.getElementById('scorePct').textContent = pct+'%';
+  document.getElementById('scoreSub').textContent =
+    `${correct} of ${state.qs.length} correct. Passing score is ${PASS_PCT}%.` + (auto?' Time expired — exam submitted automatically.':'');
+  document.getElementById('stCorrect').textContent=correct;
+  document.getElementById('stWrong').textContent=wrong;
+  document.getElementById('stSkip').textContent=skipped;
+  document.getElementById('stTime').textContent=fmt(timeUsed);
+
+  buildReview('all');
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); buildReview(b.dataset.f); };
+  });
+  document.getElementById('retakeBtn').onclick=()=>{ if(confirm('Start a brand-new examination with a fresh set of randomly drawn questions?')){ state=null; showIntro(); } };
+  window.scrollTo(0,0);
+}
+
+function buildReview(filter){
+  const list=document.getElementById('reviewList'); list.innerHTML='';
+  state.qs.forEach((q,i)=>{
+    const p=state.answers[i];
+    let status = !p.length?'skipped':(isCorrect(q,p)?'correct':'incorrect');
+    if(filter!=='all' && filter!==status) return;
+    const item=document.createElement('div'); item.className='review-item '+status;
+    const tagText = status==='correct'?'Correct':status==='incorrect'?'Incorrect':'Unanswered';
+    let opts='';
+    q.options.forEach(o=>{
+      const isC=q.correct.includes(o.letter);
+      const isP=p.includes(o.letter);
+      let cls='ri-opt', flag='';
+      if(isC){cls+=' correct-opt'; flag='Correct answer';}
+      if(isP && !isC){cls+=' wrong-pick'; flag='Your selection';}
+      else if(isP && isC){flag='Correct answer &middot; your selection';}
+      opts+=`<div class="${cls}"><span class="ltr">${o.letter}.</span><span>${escapeHtml(o.text)}</span>${flag?`<span class="flag">${flag}</span>`:''}</div>`;
+    });
+    const yourAns = p.length? p.slice().sort().join(', ') : 'No answer';
+    item.innerHTML=`<div class="ri-head">
+        <span class="ri-num">Item ${i+1} &middot; ${q.multi?'Multiple response':'Multiple choice'}</span>
+        <span class="ri-tag ${status}">${tagText}</span></div>
+      <div class="ri-stem">${escapeHtml(q.stem)}</div>
+      ${opts}
+      <div style="font-size:.78rem;color:var(--gray-500);margin-top:.6rem;font-family:var(--font-mono)">Your answer: ${escapeHtml(yourAns)} &nbsp;|&nbsp; Correct: ${q.correct.join(', ')}</div>`;
+    list.appendChild(item);
+  });
+  if(!list.children.length){ list.innerHTML='<p style="color:var(--gray-500);font-size:.9rem">No items in this category.</p>'; }
+}
+function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- boot ---------- */
+showIntro();
+</script>
+</body>
+</html>
